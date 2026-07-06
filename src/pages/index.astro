@@ -1,11 +1,39 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Qemu Vi Lab</title>
+  </head>
+
+  <body>
+    <main style="max-width: 880px; margin: 80px auto; padding: 0 24px; font-family: system-ui, sans-serif;">
+      <h1>Qemu Vi Lab</h1>
+
+      <p>
+        AI Security, Binary Analysis, and System Security.
+      </p>
+
+      <p>
+        这里记录我的网络安全、二进制分析、深度学习、论文阅读和研究生阶段的技术成长。
+      </p>
+
+      <h2>方向</h2>
+      <ul>
+        <li>AI 辅助安全分析</li>
+        <li>二进制程序分析</li>
+        <li>漏洞检测与逆向工程</li>
+        <li>安全态势感知与检测工程</li>
+      </ul>
+
+      <h2>导航</h2>
+      <ul>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/projects/">Projects</a></li>
+        <li><a href="/blog/">Blog</a></li>
+      </ul>
+    </main>
+  </body>
+</html>
