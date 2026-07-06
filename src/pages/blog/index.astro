@@ -1,28 +1,22 @@
 ---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PostCard from "../../components/PostCard.astro";
+
+const posts = (await getCollection("blog"))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <title>Blog - Qemu Vi Lab</title>
-  </head>
+<BaseLayout title="Blog - Lydia Lab">
+  <section>
+    <h1 class="section-title">Blog</h1>
+    <p style="color: var(--muted); max-width: 720px;">
+      这里记录我的技术文章、项目实践、论文阅读和研究生阶段的学习过程。
+    </p>
+  </section>
 
-  <body>
-    <main style="max-width: 880px; margin: 80px auto; padding: 0 24px; font-family: system-ui, sans-serif;">
-      <h1>Blog</h1>
-
-      <p>这里记录我的技术文章、论文笔记和项目实践。</p>
-
-      <h2>文章列表</h2>
-      <ul>
-        <li>
-          <a href="/blog/ai-binary-security-roadmap/">
-            我的 AI + 二进制安全学习路线
-          </a>
-        </li>
-      </ul>
-
-      <p><a href="/">返回首页</a></p>
-    </main>
-  </body>
-</html>
+  <section class="post-list" style="margin-top: 28px;">
+    {posts.map((post) => <PostCard post={post} />)}
+  </section>
+</BaseLayout>

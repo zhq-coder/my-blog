@@ -1,0 +1,43 @@
+---
+import "../styles/global.css";
+
+const {
+  title = "Qemu Vi Lab",
+  description = "AI Security, Binary Analysis, and System Security"
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <nav class="nav">
+        <a class="logo" href="/">Qemu Vi <span>Lab</span></a>
+
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="/blog/">Blog</a>
+          <a href="/projects/">Projects</a>
+          <a href="/papers/">Papers</a>
+          <a href="/notes/">Notes</a>
+          <a href="/about/">About</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container">
+      <slot />
+    </main>
+
+    <footer class="footer">
+      Qemu Vi Lab · AI Security, Binary Analysis, and System Security
+    </footer>
+  </body>
+</html>

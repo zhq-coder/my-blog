@@ -1,39 +1,83 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Qemu Vi Lab</title>
-  </head>
+<BaseLayout
+  title="Qemu Vi Lab"
+  description="AI Security, Binary Analysis, and System Security"
+>
+  <section class="hero">
+    <div class="hero-badge">AI Security · Binary Analysis · System Security</div>
 
-  <body>
-    <main style="max-width: 880px; margin: 80px auto; padding: 0 24px; font-family: system-ui, sans-serif;">
-      <h1>Qemu Vi Lab</h1>
+    <h1>Qemu Vi Lab</h1>
 
-      <p>
-        AI Security, Binary Analysis, and System Security.
-      </p>
+    <p>
+      这里记录我的 AI 辅助安全分析、二进制程序分析、漏洞检测、逆向工程、
+      安全态势感知和研究生阶段的技术成长。
+    </p>
 
-      <p>
-        这里记录我的网络安全、二进制分析、深度学习、论文阅读和研究生阶段的技术成长。
-      </p>
+    <div class="actions">
+      <a class="btn primary" href="/projects/">View Projects</a>
+      <a class="btn" href="/blog/">Read Blog</a>
+      <a class="btn" href="https://github.com/zhq-coder" target="_blank">GitHub</a>
+    </div>
+  </section>
 
-      <h2>方向</h2>
-      <ul>
-        <li>AI 辅助安全分析</li>
-        <li>二进制程序分析</li>
-        <li>漏洞检测与逆向工程</li>
-        <li>安全态势感知与检测工程</li>
-      </ul>
+  <section>
+    <h2 class="section-title">Focus Areas</h2>
 
-      <h2>导航</h2>
-      <ul>
-        <li><a href="/about/">About</a></li>
-        <li><a href="/projects/">Projects</a></li>
-        <li><a href="/blog/">Blog</a></li>
-      </ul>
-    </main>
-  </body>
-</html>
+    <div class="grid">
+      <article class="card">
+        <h3>AI Security</h3>
+        <p>关注 LLM、深度学习与安全自动化分析的结合。</p>
+      </article>
+
+      <article class="card">
+        <h3>Binary Analysis</h3>
+        <p>研究二进制程序分析、逆向工程、函数语义理解与漏洞检测。</p>
+      </article>
+
+      <article class="card">
+        <h3>Security Engineering</h3>
+        <p>构建可落地的安全检测、日志分析和态势感知系统。</p>
+      </article>
+    </div>
+  </section>
+
+  <section style="margin-top: 48px;">
+    <h2 class="section-title">Featured Projects</h2>
+
+    <div class="grid">
+      <article class="card">
+        <h3>AI-assisted Binary Analysis System</h3>
+        <p>基于 Ghidra / angr / LLM 的二进制函数分析与风险解释系统。</p>
+        <div class="tags">
+          <span class="tag">Ghidra</span>
+          <span class="tag">angr</span>
+          <span class="tag">LLM</span>
+          <span class="tag">FastAPI</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Security Situation Awareness System</h3>
+        <p>结合 OpenResty、ModSecurity、FastAPI 和 LLM 的安全态势感知平台。</p>
+        <div class="tags">
+          <span class="tag">OpenResty</span>
+          <span class="tag">ModSecurity</span>
+          <span class="tag">LLM</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>Firmware Security Lab</h3>
+        <p>面向 IoT 固件的解包、架构识别、服务分析和漏洞函数匹配实验。</p>
+        <div class="tags">
+          <span class="tag">Firmware</span>
+          <span class="tag">IoT</span>
+          <span class="tag">Fuzzing</span>
+        </div>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
