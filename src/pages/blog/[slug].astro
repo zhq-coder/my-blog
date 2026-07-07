@@ -3,10 +3,11 @@ import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
+  const staticPostRoutes = new Set(["ai-binary-security-roadmap"]);
   const posts = await getCollection("blog");
 
   return posts
-    .filter((post) => !post.data.draft)
+    .filter((post) => !post.data.draft && !staticPostRoutes.has(post.id))
     .map((post) => ({
       params: { slug: post.id },
       props: { post },
@@ -24,18 +25,22 @@ const date = new Date(post.data.pubDate).toLocaleDateString("zh-CN", {
 ---
 
 <BaseLayout title={`${post.data.title} - Lydia Lab`} description={post.data.description}>
-  <article class="article">
+  <article class="article glass-card">
     <div class="post-meta">{date}</div>
 
     <h1>{post.data.title}</h1>
 
-    <p style="color: var(--muted); font-size: 18px;">
+    <p class="article-lead">
       {post.data.description}
     </p>
 
-    <div class="tags">
-      {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
-    </div>
+    {
+      post.data.tags.length > 0 && (
+        <div class="tags">
+          {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
+      )
+    }
 
     <Content />
   </article>

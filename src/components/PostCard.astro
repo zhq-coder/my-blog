@@ -15,7 +15,11 @@ const date = new Date(post.data.pubDate).toLocaleDateString("zh-CN", {
 
   <p>{post.data.description}</p>
 
-  <div class="tags">
-    {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
-  </div>
+  {
+    post.data.tags.length > 0 && (
+      <div class="tags">
+        {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+      </div>
+    )
+  }
 </a>

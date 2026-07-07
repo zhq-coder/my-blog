@@ -1,0 +1,278 @@
+---
+const tracks = [
+  {
+    title: "Night Coast",
+    desc: "Ambient focus playlist",
+    cover: "/images/35b0d2a44a2edcc714e03db6674c44e9.png",
+    src: "/audio/night-coast.wav",
+    tones: [196, 246.94, 293.66],
+    seconds: 8,
+  },
+  {
+    title: "Morning Glass",
+    desc: "Light study loop",
+    cover: "/images/index.png",
+    src: "/audio/morning-glass.wav",
+    tones: [261.63, 329.63, 392],
+    seconds: 7,
+  },
+];
+
+const tracksJson = JSON.stringify(tracks);
+---
+
+<aside class="side-player glass-card" aria-label="Lydia FM music player" data-music-player data-tracks={tracksJson}>
+  <audio preload="metadata" data-player-audio></audio>
+
+  <div class="player-topline">Lydia FM</div>
+
+  <div class="player-main">
+    <div class="player-cover-wrap">
+      <img class="player-cover" src={tracks[0].cover} alt="" loading="lazy" data-player-cover />
+      <span class="player-cover-fallback" aria-hidden="true">FM</span>
+    </div>
+
+    <div class="player-copy">
+      <h2 data-player-title>{tracks[0].title}</h2>
+      <p data-player-desc>{tracks[0].desc}</p>
+    </div>
+  </div>
+
+  <div class="player-controls">
+    <button class="player-skip" type="button" data-player-prev aria-label="Previous track">Prev</button>
+    <button class="player-button" type="button" data-player-toggle aria-label="Play or pause" aria-pressed="false">
+      Play
+    </button>
+    <button class="player-skip" type="button" data-player-next aria-label="Next track">Next</button>
+  </div>
+
+  <label class="player-slider-label">
+    <span class="sr-only">Playback progress</span>
+    <input class="player-seek" type="range" min="0" max="0" value="0" step="0.1" data-player-seek />
+  </label>
+
+  <div class="player-time">
+    <span data-player-current>0:00</span>
+    <span data-player-duration>0:00</span>
+  </div>
+
+  <p class="player-status" data-player-status>Ready</p>
+
+  <script is:inline>
+    (() => {
+      const audioExists = async (src) => {
+        try {
+          const response = await fetch(src, { method: "HEAD" });
+          return response.ok;
+        } catch {
+          return false;
+        }
+      };
+
+      const createToneUrl = (frequencies = [220, 277.18, 329.63], seconds = 8) => {
+        const sampleRate = 22050;
+        const samples = Math.floor(sampleRate * seconds);
+        const dataSize = samples * 2;
+        const buffer = new ArrayBuffer(44 + dataSize);
+        const view = new DataView(buffer);
+
+        const writeString = (offset, value) => {
+          for (let i = 0; i < value.length; i += 1) {
+            view.setUint8(offset + i, value.charCodeAt(i));
+          }
+        };
+
+        writeString(0, "RIFF");
+        view.setUint32(4, 36 + dataSize, true);
+        writeString(8, "WAVE");
+        writeString(12, "fmt ");
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeString(36, "data");
+        view.setUint32(40, dataSize, true);
+
+        for (let i = 0; i < samples; i += 1) {
+          const time = i / sampleRate;
+          const fadeIn = Math.min(1, time / 0.5);
+          const fadeOut = Math.min(1, (seconds - time) / 0.8);
+          const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+          const drift = 0.86 + 0.14 * Math.sin(2 * Math.PI * 0.12 * time);
+          const signal = frequencies.reduce((sum, frequency, index) => {
+            return sum + Math.sin(2 * Math.PI * frequency * time + index * 0.4) / frequencies.length;
+          }, 0);
+          const sample = Math.max(-1, Math.min(1, signal * envelope * drift * 0.28));
+
+          view.setInt16(44 + i * 2, sample * 32767, true);
+        }
+
+        return URL.createObjectURL(new Blob([buffer], { type: "audio/wav" }));
+      };
+
+      const formatTime = (value) => {
+        if (!Number.isFinite(value) || value < 0) return "0:00";
+
+        const minutes = Math.floor(value / 60);
+        const seconds = Math.floor(value % 60).toString().padStart(2, "0");
+        return `${minutes}:${seconds}`;
+      };
+
+      document.querySelectorAll("[data-music-player]").forEach((player) => {
+        const audio = player.querySelector("[data-player-audio]");
+        const title = player.querySelector("[data-player-title]");
+        const desc = player.querySelector("[data-player-desc]");
+        const cover = player.querySelector("[data-player-cover]");
+        const toggle = player.querySelector("[data-player-toggle]");
+        const prev = player.querySelector("[data-player-prev]");
+        const next = player.querySelector("[data-player-next]");
+        const seek = player.querySelector("[data-player-seek]");
+        const current = player.querySelector("[data-player-current]");
+        const duration = player.querySelector("[data-player-duration]");
+        const status = player.querySelector("[data-player-status]");
+        const tracks = JSON.parse(player.dataset.tracks || "[]");
+        let trackIndex = 0;
+        let isSeeking = false;
+        let fallbackUrl = "";
+        let loadToken = 0;
+
+        if (!audio || tracks.length === 0) return;
+
+        const setStatus = (message) => {
+          if (status) status.textContent = message;
+        };
+
+        const setPlayingState = (isPlaying) => {
+          player.classList.toggle("is-playing", isPlaying);
+          toggle.textContent = isPlaying ? "Pause" : "Play";
+          toggle.setAttribute("aria-pressed", String(isPlaying));
+        };
+
+        const loadTrack = async (index, shouldPlay = false) => {
+          const token = loadToken + 1;
+          loadToken = token;
+          trackIndex = (index + tracks.length) % tracks.length;
+          const track = tracks[trackIndex];
+
+          title.textContent = track.title;
+          desc.textContent = track.desc;
+          cover.src = track.cover;
+          cover.hidden = false;
+          audio.removeAttribute("src");
+          seek.value = "0";
+          seek.max = "0";
+          current.textContent = "0:00";
+          duration.textContent = "0:00";
+          setStatus("Loading");
+
+          if (fallbackUrl) {
+            URL.revokeObjectURL(fallbackUrl);
+            fallbackUrl = "";
+          }
+
+          const hasFile = track.src ? await audioExists(track.src) : false;
+
+          if (token !== loadToken) return;
+
+          if (hasFile) {
+            audio.src = track.src;
+            setStatus("Ready");
+          } else {
+            fallbackUrl = createToneUrl(track.tones, track.seconds);
+            audio.src = fallbackUrl;
+            setStatus("Demo audio ready");
+          }
+
+          audio.load();
+
+          if (shouldPlay) {
+            audio.play().catch(() => {
+              setPlayingState(false);
+              setStatus("Click Play to start");
+            });
+          }
+        };
+
+        toggle.addEventListener("click", () => {
+          if (audio.paused) {
+            audio.play().catch(() => {
+              setPlayingState(false);
+              setStatus("Playback unavailable");
+            });
+          } else {
+            audio.pause();
+          }
+        });
+
+        prev.addEventListener("click", () => {
+          const shouldPlay = !audio.paused;
+          loadTrack(trackIndex - 1, shouldPlay);
+        });
+
+        next.addEventListener("click", () => {
+          const shouldPlay = !audio.paused;
+          loadTrack(trackIndex + 1, shouldPlay);
+        });
+
+        seek.addEventListener("input", () => {
+          isSeeking = true;
+          current.textContent = formatTime(Number(seek.value));
+        });
+
+        seek.addEventListener("change", () => {
+          if (Number.isFinite(audio.duration)) {
+            audio.currentTime = Number(seek.value);
+          }
+
+          isSeeking = false;
+        });
+
+        audio.addEventListener("play", () => {
+          setPlayingState(true);
+          setStatus("Playing");
+        });
+
+        audio.addEventListener("pause", () => {
+          setPlayingState(false);
+          setStatus(audio.currentTime > 0 ? "Paused" : "Ready");
+        });
+
+        audio.addEventListener("loadedmetadata", () => {
+          const total = Number.isFinite(audio.duration) ? audio.duration : 0;
+          seek.max = String(total);
+          duration.textContent = formatTime(total);
+          if (audio.paused) {
+            setStatus(audio.src.startsWith("blob:") ? "Demo audio ready" : "Ready");
+          }
+        });
+
+        audio.addEventListener("timeupdate", () => {
+          if (!isSeeking) {
+            seek.value = String(audio.currentTime);
+            current.textContent = formatTime(audio.currentTime);
+          }
+        });
+
+        audio.addEventListener("ended", () => {
+          setPlayingState(false);
+          setStatus("Ended");
+          loadTrack(trackIndex + 1, tracks.length > 1);
+        });
+
+        audio.addEventListener("error", () => {
+          setPlayingState(false);
+          setStatus("Audio failed to load");
+        });
+
+        cover.addEventListener("error", () => {
+          cover.hidden = true;
+        });
+
+        loadTrack(0);
+      });
+    })();
+  </script>
+</aside>

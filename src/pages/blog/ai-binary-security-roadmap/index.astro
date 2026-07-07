@@ -1,49 +1,41 @@
 ---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+const posts = await getCollection("blog");
+const post = posts.find((item) => item.id === "ai-binary-security-roadmap");
+
+if (!post) {
+  throw new Error("Missing blog post: ai-binary-security-roadmap");
+}
+
+const { Content } = await render(post);
+
+const date = new Date(post.data.pubDate).toLocaleDateString("zh-CN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <title>我的 AI + 二进制安全学习路线</title>
-  </head>
+<BaseLayout title={`${post.data.title} - Lydia Lab`} description={post.data.description}>
+  <article class="article glass-card">
+    <div class="post-meta">{date}</div>
 
-  <body>
-    <main style="max-width: 820px; margin: 80px auto; padding: 0 24px; font-family: system-ui, sans-serif; line-height: 1.8;">
-      <h1>我的 AI + 二进制安全学习路线</h1>
+    <h1>{post.data.title}</h1>
 
-      <p>
-        最近我准备把研究方向聚焦到 AI 辅助二进制安全分析。
-      </p>
+    <p class="article-lead">
+      {post.data.description}
+    </p>
 
-      <h2>为什么选择这个方向</h2>
+    {
+      post.data.tags.length > 0 && (
+        <div class="tags">
+          {post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+        </div>
+      )
+    }
 
-      <p>
-        二进制安全关注真实程序中的底层漏洞、逆向分析、漏洞检测和系统安全问题。
-        深度学习和大语言模型可以帮助提升分析效率，例如函数摘要、危险 API 识别、
-        反编译代码解释和漏洞风险判断。
-      </p>
-
-      <h2>我计划学习的内容</h2>
-
-      <ul>
-        <li>C / C++ 内存模型</li>
-        <li>x86-64 汇编</li>
-        <li>ELF 文件格式</li>
-        <li>Ghidra / angr</li>
-        <li>Fuzzing 和漏洞检测</li>
-        <li>PyTorch 和深度学习基础</li>
-        <li>LLM 辅助逆向工程</li>
-      </ul>
-
-      <h2>项目目标</h2>
-
-      <p>
-        我计划做一个 AI-assisted Binary Analysis System，
-        支持上传二进制文件，自动提取函数、字符串、危险 API、调用关系，
-        并结合 LLM 生成函数摘要和风险分析报告。
-      </p>
-
-      <p><a href="/blog/">返回 Blog</a></p>
-    </main>
-  </body>
-</html>
+    <Content />
+  </article>
+</BaseLayout>

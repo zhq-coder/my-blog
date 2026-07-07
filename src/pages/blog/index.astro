@@ -8,15 +8,16 @@ const posts = (await getCollection("blog"))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<BaseLayout title="Blog - Lydia Lab">
-  <section>
-    <h1 class="section-title">Blog</h1>
-    <p style="color: var(--muted); max-width: 720px;">
-      这里记录我的技术文章、项目实践、论文阅读和研究生阶段的学习过程。
+<BaseLayout title="Blog - Lydia Lab" description="Lydia Lab 的文章列表">
+  <section class="page-hero glass-card">
+    <p class="section-kicker">Blog</p>
+    <h1>文章索引</h1>
+    <p class="page-copy">
+      这里记录技术文章、项目实践、论文阅读和研究生阶段的学习过程。
     </p>
   </section>
 
-  <section class="post-list" style="margin-top: 28px;">
+  <section class="post-list">
     {posts.map((post) => <PostCard post={post} />)}
   </section>
 </BaseLayout>

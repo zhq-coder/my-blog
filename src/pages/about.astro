@@ -1,37 +1,32 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <title>About - Lydia Lab</title>
-  </head>
+<BaseLayout title="About - Lydia Lab" description="关于 Lydia Lab">
+  <section class="page-hero glass-card">
+    <p class="section-kicker">About</p>
+    <h1>关于我</h1>
+    <p class="page-copy">
+      我关注 AI Security、Binary Analysis、Vulnerability Detection、Reverse Engineering 和 Security Engineering。
+    </p>
+  </section>
 
-  <body>
-    <main style="max-width: 880px; margin: 80px auto; padding: 0 24px; font-family: system-ui, sans-serif;">
-      <h1>About Me</h1>
+  <section class="section-block glass-card">
+    <div class="feature-grid">
+      <article class="card">
+        <h3>Current Focus</h3>
+        <p>AI 辅助二进制分析、Ghidra / angr 自动化分析、LLM 辅助逆向工程和安全自动化系统建设。</p>
+      </article>
 
-      <p>
-        我关注 AI Security、Binary Analysis、Vulnerability Detection、Reverse Engineering 和 Security Engineering。
-      </p>
+      <article class="card">
+        <h3>Skills</h3>
+        <p>Python / FastAPI / Docker / Linux / Git / Shell / Ghidra / angr / Binary Analysis / LLM。</p>
+      </article>
 
-      <h2>Current Focus</h2>
-      <ul>
-        <li>AI 辅助二进制分析</li>
-        <li>Ghidra / angr 自动化分析</li>
-        <li>LLM 辅助逆向工程</li>
-        <li>安全自动化系统建设</li>
-      </ul>
-
-      <h2>Skills</h2>
-      <ul>
-        <li>Python / FastAPI / Docker</li>
-        <li>Linux / Git / Shell</li>
-        <li>Ghidra / angr / Binary Analysis</li>
-        <li>LLM / PyTorch / Security Automation</li>
-      </ul>
-
-      <p><a href="/">返回首页</a></p>
-    </main>
-  </body>
-</html>
+      <article class="card">
+        <h3>Goal</h3>
+        <p>把研究课题做成可演示、可部署、可复盘的系统，并持续沉淀学习笔记。</p>
+      </article>
+    </div>
+  </section>
+</BaseLayout>

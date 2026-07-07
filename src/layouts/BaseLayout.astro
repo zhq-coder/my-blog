@@ -1,10 +1,36 @@
 ---
+import MusicPlayer from "../components/MusicPlayer.astro";
 import "../styles/global.css";
 
 const {
   title = "Lydia Lab",
-  description = "AI Security, Binary Analysis, and System Security"
+  description = "记录技术、生活、审美与成长的个人空间。",
 } = Astro.props;
+
+const navItems = [
+  { href: "/", label: "Home" },
+  { href: "/blog/", label: "Blog" },
+  { href: "/projects/", label: "Projects" },
+  { href: "/notes/", label: "Notes" },
+  { href: "/papers/", label: "Papers" },
+  { href: "/about/", label: "About" },
+];
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+const getPageType = (path: string) => {
+  if (path === "/") return "home";
+  if (path.startsWith("/blog/")) return "blog";
+  if (path.startsWith("/projects/") || path.startsWith("/project/")) return "projects";
+  if (path.startsWith("/notes/")) return "notes";
+  if (path.startsWith("/papers/")) return "papers";
+  if (path.startsWith("/about/")) return "about";
+  if (path.startsWith("/message/")) return "message";
+  return "default";
+};
+
+const pageType = getPageType(pathname);
 ---
 
 <!doctype html>
@@ -13,31 +39,144 @@ const {
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <script is:inline>
+      (() => {
+        const storageKey = "lydia-theme";
+        const root = document.documentElement;
+
+        try {
+          const saved = localStorage.getItem(storageKey);
+          const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          const theme = saved || systemTheme;
+
+          root.dataset.theme = theme;
+          root.style.colorScheme = theme;
+        } catch {
+          root.dataset.theme = "light";
+          root.style.colorScheme = "light";
+        }
+      })();
+    </script>
     <title>{title}</title>
   </head>
 
-  <body>
+  <body class={`page-${pageType}`}>
+    <div class="background-vignette" aria-hidden="true"></div>
+
     <header class="site-header">
-      <nav class="nav">
-        <a class="logo" href="/">Lydia <span>Lab</span></a>
+      <nav class="nav glass-card" aria-label="Primary navigation">
+        <a class="logo" href="/" aria-label="Lydia Lab Home">
+          <span class="avatar-wrap">
+            <!-- Replace public/images/head.png with your own avatar when ready. -->
+            <img class="avatar-img" src="/images/head.png" alt="Lydia Lab avatar" loading="eager" />
+            <span class="avatar-fallback" aria-hidden="true">L</span>
+          </span>
+          <span>Lydia Lab</span>
+        </a>
 
         <div class="nav-links">
-          <a href="/">Home</a>
-          <a href="/blog/">Blog</a>
-          <a href="/projects/">Projects</a>
-          <a href="/papers/">Papers</a>
-          <a href="/notes/">Notes</a>
-          <a href="/about/">About</a>
+          {
+            navItems.map((item) => (
+              <a class:list={["nav-link", { active: isActive(item.href) }]} href={item.href}>
+                {item.label}
+              </a>
+            ))
+          }
+        </div>
+
+        <div class="nav-actions">
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换日夜模式">
+            <span class="theme-toggle-track" aria-hidden="true">
+              <span class="theme-toggle-thumb"></span>
+            </span>
+            <span class="theme-toggle-text" data-theme-label>Theme</span>
+          </button>
+
+          <a class="nav-message" href="/message/">Message</a>
         </div>
       </nav>
     </header>
 
-    <main class="container">
-      <slot />
-    </main>
+    <div class="site-shell">
+      <main class="content-column">
+        <slot />
+      </main>
+
+      <MusicPlayer />
+    </div>
 
     <footer class="footer">
       Lydia Lab · AI Security, Binary Analysis, and System Security
     </footer>
+
+    <script is:inline>
+      const storageKey = "lydia-theme";
+      const root = document.documentElement;
+
+      const setTheme = (theme) => {
+        root.dataset.theme = theme;
+        root.style.colorScheme = theme;
+
+        document.querySelectorAll("[data-theme-label]").forEach((label) => {
+          label.textContent = theme === "dark" ? "Night" : "Day";
+        });
+
+        document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+          button.setAttribute("aria-pressed", String(theme === "dark"));
+        });
+      };
+
+      document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+
+          try {
+            localStorage.setItem(storageKey, nextTheme);
+          } catch {
+            // Storage can be unavailable in private contexts; visual switching still works.
+          }
+
+          setTheme(nextTheme);
+        });
+      });
+
+      setTheme(root.dataset.theme || "light");
+
+      document.querySelectorAll(".avatar-img").forEach((image) => {
+        const showFallback = () => {
+          image.hidden = true;
+          image.nextElementSibling?.classList.add("is-visible");
+        };
+
+        image.addEventListener("error", showFallback);
+
+        if (image.complete && image.naturalWidth === 0) {
+          showFallback();
+        }
+      });
+
+      const interactiveItems = document.querySelectorAll(
+        ".nav-link, .nav-message, .theme-toggle, .btn, .post-card, .player-button, .player-skip"
+      );
+
+      interactiveItems.forEach((item) => {
+        item.addEventListener("click", (event) => {
+          const rect = item.getBoundingClientRect();
+          const ripple = document.createElement("span");
+          const size = Math.max(rect.width, rect.height);
+
+          ripple.className = "click-ripple";
+          ripple.style.width = `${size}px`;
+          ripple.style.height = `${size}px`;
+          ripple.style.left = `${event.clientX - rect.left - size / 2}px`;
+          ripple.style.top = `${event.clientY - rect.top - size / 2}px`;
+
+          item.appendChild(ripple);
+          window.setTimeout(() => ripple.remove(), 520);
+        });
+      });
+    </script>
   </body>
 </html>

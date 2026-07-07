@@ -1,34 +1,53 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <title>Projects - ZHQ Lab</title>
-  </head>
+<BaseLayout title="Projects - Lydia Lab" description="Lydia Lab 的项目列表">
+  <section class="page-hero glass-card">
+    <p class="section-kicker">Projects</p>
+    <h1>项目实验室</h1>
+    <p class="page-copy">
+      这里整理课程设计、实验系统和个人安全工具的开发进度。
+    </p>
+  </section>
 
-  <body>
-    <main style="max-width: 880px; margin: 80px auto; padding: 0 24px; font-family: system-ui, sans-serif;">
-      <h1>Projects</h1>
+  <section class="section-block glass-card">
+    <div class="grid">
+      <article class="card">
+        <h3>AI-assisted Binary Analysis System</h3>
+        <p>
+          面向 ELF / PE 二进制文件的 AI 辅助分析系统，计划支持函数提取、危险 API 识别、调用图分析、LLM 摘要和风险报告。
+        </p>
+        <div class="tags">
+          <span class="tag">IDA</span>
+          <span class="tag">Ghidra</span>
+          <span class="tag">LLM</span>
+        </div>
+      </article>
 
-      <h2>AI-assisted Binary Analysis System</h2>
-      <p>
-        一个面向 ELF / PE 二进制文件的 AI 辅助分析系统，计划支持函数提取、危险 API 识别、
-        调用图分析、LLM 函数摘要、风险评分和漏洞分析报告生成。
-      </p>
+      <article class="card">
+        <h3>Security Situation Awareness System</h3>
+        <p>
+          基于生成式 AI 的内网异常行为阻断与设备态势感知系统，用于异常事件分析、攻击链解释和处置建议生成。
+        </p>
+        <div class="tags">
+          <span class="tag">OpenResty</span>
+          <span class="tag">ModSecurity</span>
+          <span class="tag">FastAPI</span>
+        </div>
+      </article>
 
-      <h2>Security Situation Awareness System</h2>
-      <p>
-        基于 OpenResty、ModSecurity、FastAPI 和 LLM 的安全态势感知系统，用于异常事件分析、
-        攻击链解释和处置建议生成。
-      </p>
-
-      <h2>Firmware Security Lab</h2>
-      <p>
-        面向 IoT 固件的安全分析实验项目，计划支持固件解包、架构识别、Web 服务识别和漏洞函数匹配。
-      </p>
-
-      <p><a href="/">返回首页</a></p>
-    </main>
-  </body>
-</html>
+      <article class="card">
+        <h3>Firmware Security Lab</h3>
+        <p>
+          面向 IoT 固件的安全分析实验，覆盖固件解包、架构识别、Web 服务识别和漏洞函数匹配。
+        </p>
+        <div class="tags">
+          <span class="tag">Firmware</span>
+          <span class="tag">IoT</span>
+          <span class="tag">Fuzzing</span>
+        </div>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
